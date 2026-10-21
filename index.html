@@ -3647,7 +3647,7 @@ h1{font-size:22px;margin:4px 0}.sub{color:#9aa;font-size:13px}
 .mbody{display:flex;gap:12px}#big{flex:1;height:calc(100vh - 80px);min-height:560px}
 .side{width:260px;font-size:14px}.side table{width:100%;border-collapse:collapse}.side td{padding:4px;border-bottom:1px solid #263}
 footer{margin-top:20px;font-size:12px;color:#8a93a6;line-height:1.7}
-.vt button.on{background:#3b4a7a;border-color:#6a7fd0}#big{position:relative}#lgd{position:absolute;left:6px;top:4px;z-index:3;font-size:12px;line-height:1.5;background:#0f1117cc;padding:2px 6px;border-radius:4px;pointer-events:none}#tv{flex:1;height:calc(100vh - 110px);min-height:560px;display:none}.mbar{flex-wrap:wrap}
+.vt button.on{background:#3b4a7a;border-color:#6a7fd0}#big{position:relative}.drbar{margin:4px 0;display:flex;flex-wrap:wrap;gap:6px;align-items:center;font-size:13px}.drbar button{background:#1c2030;color:#ddd;border:1px solid #445;padding:5px 10px;border-radius:6px}.drbar button.on{background:#c6ff00;color:#000;font-weight:bold}#dstat{color:#9aa}#dstat.drawing{color:#000;background:#c6ff00;padding:3px 8px;border-radius:4px;font-weight:bold}#lgd{position:absolute;left:6px;top:4px;z-index:3;font-size:12px;line-height:1.5;background:#0f1117cc;padding:2px 6px;border-radius:4px;pointer-events:none}#tv{flex:1;height:calc(100vh - 110px);min-height:560px;display:none}.mbar{flex-wrap:wrap}
 @media(max-width:700px){body{padding:8px}.mbody{flex-direction:column}#big,#tv{flex:none;width:100%;height:60vh;min-height:0}.side{width:100%}#mt{font-size:13px!important;display:block;width:100%;margin:4px 0!important}}
 </style></head><body>
 <h1>葛蘭碧買進法則 ①② 儀表板：已成立＋潛在追蹤</h1>
@@ -3657,7 +3657,7 @@ footer{margin-top:20px;font-size:12px;color:#8a93a6;line-height:1.7}
 　<span style="color:#ff4d4f">▌</span>已成立　<span style="color:#2f8cff">▌</span>潛在（尚未觸發）</div>
 <div class="grid" id="grid"></div>
 <div id="modal"><div class="mbar"><button id="prev">◀ 上一檔</button><button id="next">下一檔 ▶</button><span id="mt" style="font-size:17px;font-weight:bold;margin-left:10px"></span><span class="vt"><button id="vk" class="on">互動K線（含標註）</button><label style="font-size:13px"><input type="checkbox" id="showT" checked onchange="draw(E[cur])">顯示目標價</label> <button id="vtv">TradingView 互動圖</button> <a id="tvlink" target="_blank" rel="noopener" style="color:#8ab4ff;font-size:13px">在 TradingView 開啟 ↗</a></span><span style="flex:1"></span><button id="close">✕ 關閉 (Esc)</button></div>
-<div class="mbody"><div id="big"></div><div id="tv"></div><div class="side" id="side"></div></div></div>
+<div class="drbar" id="drbar"><button id="dh">水平線</button><button id="dt">趨勢線</button><button id="du">刪除最後一條</button><button id="dc">清除本檔全部</button> <span id="dstat"></span></div><div class="mbody"><div id="big"></div><div id="tv"></div><div class="side" id="side"></div></div></div>
 <footer>資料來源：Yahoo Finance（本機快取＋yfinance 補至 2026-10-20，未還原價）。訊號欄位取自 /workspace/granville_screen/ 的 2026-10-19_granville_all_signals.csv、2026-10-21_recheck_1019_triggers.csv、2026-10-21_potential_12_all.csv。<br>
 回測（240 日線、全部樣本，2026-10-19_granville_backtest.csv）：①突破(均線轉平/升)：60日樣本 643、平均報酬 3.11%、相對大盤超額 -2.94%、超額勝率 36.9%；②跌破後站回：60日樣本 973、平均報酬 1.29%、相對大盤超額 -2.64%、超額勝率 36.3%。亦即 ①② 觸發後 60 日平均落後大盤約 3%。<br>
 「潛在」只代表離觸發條件很近，不代表一定會觸發；信心度指近期觸發的可能性，不是報酬。波浪判讀來自 /workspace/wave_screen/2026-10-19_wave_all.csv，為 10/19 資料；約 3 成會隨門檻參數改變而改變分類（agree＝重跑一致數，滿分 2）；波浪價位原為還原權息價，已依 Yahoo 還原因子換算成未還原價（無法換算者註明）；波浪判讀亦為【推論】。<br>本頁全部內容為【推論】，僅供研究參考，不是投資建議，也不保證報酬。</footer>
@@ -3692,11 +3692,11 @@ let LWc=null,VM='k',tvP=null;
 function tvSym(e){return (e.mkt=='上櫃'?'TPEX':'TWSE')+':'+e.code}
 function loadTV(){return tvP||(tvP=new Promise((ok,no)=>{const s=document.createElement('script');s.src='https://s3.tradingview.com/tv.js';s.onload=ok;s.onerror=no;document.head.appendChild(s)}))}
 function buildTV(e){const c=document.getElementById('tv');c.innerHTML='<div id="tvc" style="height:100%"></div>';loadTV().then(()=>{new TradingView.widget({container_id:'tvc',autosize:true,symbol:tvSym(e),interval:'D',timezone:'Asia/Taipei',theme:'dark',style:'1',locale:'zh_TW',allow_symbol_change:true,studies:[{id:'MASimple@tv-basicstudies',inputs:{length:240}},{id:'MASimple@tv-basicstudies',inputs:{length:60}},{id:'MASimple@tv-basicstudies',inputs:{length:20}}]})}).catch(()=>{c.innerHTML='TradingView 載入失敗'})}
-function setVM(m){VM=m;document.getElementById('vk').classList.toggle('on',m=='k');document.getElementById('vtv').classList.toggle('on',m=='tv');document.getElementById('big').style.display=m=='k'?'':'none';document.getElementById('tv').style.display=m=='tv'?'block':'none';const e=E[cur];if(m=='tv')buildTV(e);else{document.getElementById('tv').innerHTML='';}}
+function setVM(m){VM=m;document.getElementById('vk').classList.toggle('on',m=='k');document.getElementById('vtv').classList.toggle('on',m=='tv');document.getElementById('big').style.display=m=='k'?'':'none';document.getElementById('tv').style.display=m=='tv'?'block':'none';document.getElementById('drbar').style.display=m=='k'?'':'none';if(DR.mode)drMode(null);const e=E[cur];if(m=='tv')buildTV(e);else{document.getElementById('tv').innerHTML='';}}
 function draw(e){document.getElementById('tvlink').href='https://www.tradingview.com/chart/?symbol='+encodeURIComponent(tvSym(e));drawK(e);if(VM=='tv')buildTV(e)}
 function drawK(e){const d=P[e.code];document.getElementById('mt').innerHTML=`${e.code} ${e.name} ${e.kind=='pot'?'潛在':'已成立'}${R[e.rule]}　收 ${f(e.close)}　年線 ${f(e.ma240)}　乖離 ${f(e.bias)}%　`+(e.kind=='pot'?`觸發價 ${f(e.tp)}（距離 ${f(e.dist)}%）`:`失效價 ${f(e.inv)}`)+'　'+badge(e);
  if(!d){document.getElementById('big').innerHTML='價格資料查不到';return}
- const B=document.getElementById('big');if(LWc){LWc.remove();LWc=null}B.innerHTML='';
+ const B=document.getElementById('big');if(LWc){LWc.remove();LWc=null}DR.ch=null;B.innerHTML='';
  const T=e.code+'|',showT=document.getElementById('showT').checked,n=d.x.length;
  const ch=LWc=LightweightCharts.createChart(B,{autoSize:true,layout:{background:{color:'#0f1117'},textColor:'#ddd',fontFamily:'Noto Sans CJK TC, sans-serif'},grid:{vertLines:{color:'#222'},horzLines:{color:'#222'}},crosshair:{mode:0},rightPriceScale:{scaleMargins:{top:0.06,bottom:0.27}},timeScale:{borderColor:'#333',rightOffset:5},localization:{locale:'zh-TW'}});
  const extra=[];if(e.kind=='pot'&&e.tp!=null)extra.push(e.tp);if(e.kind!='pot'&&e.inv!=null)extra.push(e.inv);
@@ -3721,12 +3721,32 @@ function drawK(e){const d=P[e.code];document.getElementById('mt').innerHTML=`${e
  const L=document.createElement('div');L.id='lgd';B.appendChild(L);
  const key='<span style="color:#4fc3f7">━MA20</span> <span style="color:#ba68c8">━MA60</span> <span style="color:#f5c542">━MA240</span> <span style="color:#fff">━20日均量</span> <span style="color:#ffeb3b">▲觸發</span> <span style="color:#e040fb">●波浪</span> '+(e.kind=='pot'?'<span style="color:#2f8cff">┅觸發價</span>':'<span style="color:#ff9800">┅失效價</span>')+(showT&&e.winv?' <span style="color:#69f0ae">┈目標</span>/<span style="color:#e040fb">失效</span>':'')+((e.wpts||[]).length?'<br><span style="color:#999">'+(e.wraw?'波浪點/價位：還原價換算為未還原價':'波浪點無法換算未還原價，只標日期')+'</span>':'');
  const show=k=>{if(k==null||k<0)k=n-1;const g=a=>a&&a[k]!=null?f(a[k]):'—';L.innerHTML=`<b>${d.x[k]}</b> 開${f(d.o[k])} 高${f(d.h[k])} 低${f(d.l[k])} 收<b class="${d.c[k]>=d.o[k]?'up':'dn'}">${f(d.c[k])}</b> 量${Math.round(d.v[k]).toLocaleString()}<br>MA20 ${g(d.m20)} MA60 ${g(d.m60)} MA240 ${g(d.m240)}<br>`+key};
- show();ch.subscribeCrosshairMove(p=>show(p&&p.time?d.x.indexOf(p.time):null));
+ show();ch.subscribeCrosshairMove(p=>show(p&&p.time?d.x.indexOf(p.time):null));drInit(ch,cs,e.code);
  let rows=[['波浪判讀(10/19)',wbadge(e)+'<br>'+(e.wsub||'')],['波浪失效價',e.winv?f(e.winv.raw??e.winv.adj):'—'],['波浪基本/樂觀目標',e.wbase?f(e.wbase.raw??e.wbase.adj)+' / '+f(e.wbull?.raw??e.wbull?.adj):'—'],['波浪報酬風險比(基本)',e.wrr??'—'],['產業／市場',(e.ind||'')+'／'+(e.mkt||'查不到')],[e.date+' 收盤',f(e.close)+' ('+(e.chg>=0?'+':'')+f(e.chg)+'%)'],['20日線',f(e.ma20)],['60日線',f(e.ma60)],['年線(240,未還原)',f(e.ma240)],['乖離(未還原)',f(e.bias)+'%'],['乖離(還原,報告)',f(e.bias_adj)+'%'],['年線20日斜率',f(e.slope,3)+'%']];
  rows=rows.concat(e.kind=='pot'?[['類型',`潛在${R[e.rule]}（${e.tier}）`],['明日觸發收盤價',f(e.tp)],['距離',f(e.dist)+'%'],['純穿越價',f(e.cross)],['明日可觸發',e.canTrig?'是':'否（明日漲停也無法觸發）'],['斜率改善',f(e.slopeImp,3)+'%'],['跌破年線天數',e.days??'—'],['量能5日/20日',f(e.vr)],['昨日量能倍數',f(e.vr1020)],['近期觸發可能性',e.conf],['評分',e.score],['20日均成交值(百萬)',e.turnover]]
   :[['法則',R[e.rule]+' 已成立'],['觸發日',e.trig],['觸發量能倍數',e.vr==null?'查不到':e.vr+'x'],['10/20 量能倍數',f(e.vr1020)],['失效價(10/20重算)',f(e.inv)],['失效價(10/19)',f(e.inv1019)],['失效條件',e.cond],['10/20 狀態',e.statusText],['信心度(10/19)',e.conf??'查不到'],['評分',e.score??'查不到']]);
  document.getElementById('side').innerHTML='<table>'+rows.map(r=>`<tr><td style="color:#9aa">${r[0]}</td><td>${r[1]}</td></tr>`).join('')+'</table><p style="font-size:12px;color:#889">【推論】非投資建議</p>'}
 document.getElementById('sort').onchange=grid;document.getElementById('wv').onchange=()=>{tabs();grid()};
+
+const DC='#c6ff00';let DR={ch:null,cs:null,code:null,objs:[],mode:null,p1:null};
+function drKey(c){return 'gd_draw_'+c}
+function drLoad(c){try{return JSON.parse(localStorage.getItem(drKey(c))||'[]')}catch(x){return []}}
+function drSave(){localStorage.setItem(drKey(DR.code),JSON.stringify(DR.objs.map(o=>o.d)))}
+function drRender(d){if(d.t=='h'){const pl=DR.cs.createPriceLine({price:d.p,color:DC,lineWidth:2,lineStyle:0,axisLabelVisible:true,title:'✎'});return {d,rm:()=>DR.cs.removePriceLine(pl)}}
+ const a=[{time:d.a[0],value:d.a[1]},{time:d.b[0],value:d.b[1]}].sort((x,y)=>x.time<y.time?-1:1);if(a[0].time==a[1].time)a.pop();
+ const s=DR.ch.addLineSeries({color:DC,lineWidth:2,priceLineVisible:false,lastValueVisible:false,crosshairMarkerVisible:false,pointMarkersVisible:true});s.setData(a);return {d,rm:()=>DR.ch.removeSeries(s)}}
+function drAdd(d){DR.objs.push(drRender(d));drSave();drStat()}
+function drMode(m){DR.mode=m;DR.p1=null;if(DR.ch)DR.ch.applyOptions({handleScroll:!m,handleScale:!m});
+ document.getElementById('dh').classList.toggle('on',m=='h');document.getElementById('dt').classList.toggle('on',m=='t');drStat()}
+function drStat(){const s=document.getElementById('dstat');const n=DR.objs.length;
+ s.textContent=DR.mode=='h'?'✎ 水平線：點圖上一個價位':DR.mode=='t'?(DR.p1?'✎ 趨勢線：點第二點':'✎ 趨勢線：點第一點'):'我的畫線 '+n+' 條（只存在這個瀏覽器）';s.className=DR.mode?'drawing':''}
+function drInit(ch,cs,code){DR.ch=ch;DR.cs=cs;DR.code=code;DR.objs=drLoad(code).map(drRender);drMode(null);
+ ch.subscribeClick(p=>{if(!DR.mode||!p.point)return;const pr=cs.coordinateToPrice(p.point.y);const t=p.time||ch.timeScale().coordinateToTime(p.point.x);if(pr==null||t==null)return;const pt=[t,+pr.toFixed(2)];
+  if(DR.mode=='h'){drAdd({t:'h',p:pt[1]});drMode(null)}else if(!DR.p1){DR.p1=pt;drStat()}else{drAdd({t:'t',a:DR.p1,b:pt});drMode(null)}})}
+function drUndo(){const o=DR.objs.pop();if(o){o.rm();drSave()}drStat()}
+function drClear(){if(DR.objs.length&&!confirm('清除本檔全部畫線？'))return;DR.objs.forEach(o=>o.rm());DR.objs=[];drSave();drStat()}
+document.getElementById('dh').onclick=()=>drMode(DR.mode=='h'?null:'h');document.getElementById('dt').onclick=()=>drMode(DR.mode=='t'?null:'t');document.getElementById('du').onclick=drUndo;document.getElementById('dc').onclick=drClear;
+document.addEventListener('keydown',ev=>{if(ev.key=='Escape'&&DR.mode){drMode(null);ev.stopImmediatePropagation()}},true);
 document.getElementById('vk').onclick=()=>setVM('k');document.getElementById('vtv').onclick=()=>setVM('tv');document.getElementById('close').onclick=closeM;document.getElementById('prev').onclick=()=>step(-1);document.getElementById('next').onclick=()=>step(1);
 document.addEventListener('keydown',e=>{if(document.getElementById('modal').style.display!='block')return;if(e.key=='Escape')closeM();if(e.key=='ArrowLeft')step(-1);if(e.key=='ArrowRight')step(1)});
 const h=location.hash.slice(1);if(TABS.find(t=>t[0]==h))tab=h;tabs();grid();
